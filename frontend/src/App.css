@@ -1,0 +1,58 @@
+.app {
+  min-height: 100vh;
+  color: #182126;
+  background: #f8faf7;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 480px);
+  align-items: center;
+  gap: 48px;
+  width: min(1120px, calc(100% - 40px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 56px 0;
+}
+
+.hero__content {
+  max-width: 680px;
+}
+
+.hero__eyebrow {
+  margin: 0 0 14px;
+  color: #2f7d62;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #102018;
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 0.96;
+}
+
+.hero__image {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+}
+
+@media (max-width: 820px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    min-height: auto;
+    padding-top: 40px;
+  }
+
+  .hero__image {
+    max-height: 300px;
+  }
+
+  .project-scope {
+    grid-template-columns: 1fr;
+  }
+}
