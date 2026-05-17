@@ -1,5 +1,6 @@
 .app {
   min-height: 100vh;
+  padding-bottom: 48px;
   color: #182126;
   background: #f8faf7;
 }
@@ -40,6 +41,38 @@
   object-fit: contain;
 }
 
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  width: min(1120px, calc(100% - 40px));
+  margin: -72px auto 0;
+  overflow: hidden;
+  border: 1px solid #dbe5dd;
+  border-radius: 8px;
+  background: #dbe5dd;
+}
+
+.summary div {
+  min-height: 120px;
+  padding: 22px;
+  background: #ffffff;
+}
+
+.summary span {
+  display: block;
+  margin-bottom: 10px;
+  color: #557168;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.summary strong {
+  display: block;
+  color: #102018;
+  line-height: 1.45;
+}
+
 @media (max-width: 820px) {
   .hero {
     grid-template-columns: 1fr;
@@ -52,7 +85,8 @@
     max-height: 300px;
   }
 
-  .project-scope {
+  .summary {
     grid-template-columns: 1fr;
+    margin-top: 0;
   }
 }
