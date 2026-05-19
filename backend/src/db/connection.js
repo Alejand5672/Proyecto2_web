@@ -11,6 +11,8 @@ if (databaseDirectory !== '.') {
 
 export const db = new sqlite3.Database(env.databasePath)
 
+db.run('PRAGMA foreign_keys = ON')
+
 export function run(sql, params = []) {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function onRun(error) {
