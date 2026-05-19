@@ -1,18 +1,62 @@
 import { useEffect, useState } from 'react'
 import heroImg from './assets/hero.png'
+import FormularioItem from './components/FormularioItem'
+import ListaItems from './components/ListaItems'
 import {
   guardarDestinos,
   obtenerDestinosGuardados,
 } from './services/destinosStorage'
-import { CATEGORIAS, obtenerCategoriaPorId } from './utils/categorias'
+import { CATEGORIAS } from './utils/categorias'
 import './App.css'
 
 function App() {
-  const [destinos] = useState(() => obtenerDestinosGuardados())
+  const [destinos, setDestinos] = useState(() => obtenerDestinosGuardados())
+  const [destinoEditando, setDestinoEditando] = useState(null)
 
   useEffect(() => {
     guardarDestinos(destinos)
   }, [destinos])
+
+  function guardarDestino(destinoGuardado) {
+    setDestinos((destinosActuales) => {
+      const existeDestino = destinosActuales.some(
+        (destino) => destino.id === destinoGuardado.id,
+      )
+
+      if (existeDestino) {
+        return destinosActuales.map((destino) =>
+          destino.id === destinoGuardado.id ? destinoGuardado : destino,
+        )
+      }
+
+      return [destinoGuardado, ...destinosActuales]
+    })
+
+    setDestinoEditando(null)
+  }
+
+  function eliminarDestino(destinoId) {
+    setDestinos((destinosActuales) =>
+      destinosActuales.filter((destino) => destino.id !== destinoId),
+    )
+
+    if (destinoEditando?.id === destinoId) {
+      setDestinoEditando(null)
+    }
+  }
+
+  function cambiarActivo(destinoId) {
+    setDestinos((destinosActuales) =>
+      destinosActuales.map((destino) =>
+        destino.id === destinoId
+          ? {
+              ...destino,
+              activo: !destino.activo,
+            }
+          : destino,
+      ),
+    )
+  }
 
   return (
     <main className="app">
@@ -48,42 +92,20 @@ function App() {
         </div>
       </section>
 
-      <section className="destinations" aria-label="Destinos registrados">
-        {destinos.map((destino) => (
-          <article className="destination-card" key={destino.id}>
-            <div>
-              <span>{destino.pais}</span>
-              <h2>{destino.nombre}</h2>
-            </div>
-            <dl>
-              <div>
-                <dt>Ciudad</dt>
-                <dd>{destino.ciudad}</dd>
-              </div>
-              <div>
-                <dt>Estado</dt>
-                <dd>{destino.estado}</dd>
-              </div>
-              <div>
-                <dt>Categoria</dt>
-                <dd>{obtenerCategoriaPorId(destino.categoriaId)?.nombre}</dd>
-              </div>
-              <div>
-                <dt>Calificacion</dt>
-                <dd>{destino.calificacion}/5</dd>
-              </div>
-              <div>
-                <dt>Dias</dt>
-                <dd>{destino.atributos.diasEnDestino}</dd>
-              </div>
-              <div>
-                <dt>Experiencia</dt>
-                <dd>{destino.atributos.tipoExperiencia}</dd>
-              </div>
-            </dl>
-            <p>{destino.atributos.notas}</p>
-          </article>
-        ))}
+      <section className="crud-layout" aria-label="Administrar destinos">
+        <FormularioItem
+          destinoEditando={destinoEditando}
+          key={destinoEditando?.id ?? 'nuevo-destino'}
+          onCancelar={() => setDestinoEditando(null)}
+          onGuardar={guardarDestino}
+        />
+
+        <ListaItems
+          destinos={destinos}
+          onCambiarActivo={cambiarActivo}
+          onEditar={setDestinoEditando}
+          onEliminar={eliminarDestino}
+        />
       </section>
     </main>
   )
