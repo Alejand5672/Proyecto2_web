@@ -80,3 +80,9 @@ npm start
 ## Nota importante
 
 En esta fase el frontend y el backend son independientes.
+
+
+# Captura prueba fase 1
+## Captura prueba fase 1
+
+![Mis primeras pruebas](./capturasPrueba/primeraFase.png)
