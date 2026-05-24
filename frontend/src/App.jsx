@@ -1,62 +1,130 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
-import {
-  guardarDestinos,
-  obtenerDestinosGuardados,
-} from './services/destinosStorage'
+import { useStorage } from './context/storageContext'
 import { CATEGORIAS } from './utils/categorias'
 import './App.css'
 
 function App() {
-  const [destinos, setDestinos] = useState(() => obtenerDestinosGuardados())
+  const { eliminarItem, guardarItem, obtenerItems } = useStorage()
+  const [destinos, setDestinos] = useState([])
   const [destinoEditando, setDestinoEditando] = useState(null)
+  const [cargandoDestinos, setCargandoDestinos] = useState(true)
+  const [errorDatos, setErrorDatos] = useState('')
 
   useEffect(() => {
-    guardarDestinos(destinos)
-  }, [destinos])
+    let componenteActivo = true
 
-  function guardarDestino(destinoGuardado) {
-    setDestinos((destinosActuales) => {
-      const existeDestino = destinosActuales.some(
-        (destino) => destino.id === destinoGuardado.id,
-      )
+    async function cargarDestinos() {
+      try {
+        setCargandoDestinos(true)
+        const destinosGuardados = await obtenerItems()
 
-      if (existeDestino) {
-        return destinosActuales.map((destino) =>
-          destino.id === destinoGuardado.id ? destinoGuardado : destino,
+        if (componenteActivo) {
+          setDestinos(destinosGuardados)
+          setErrorDatos('')
+        }
+      } catch {
+        if (componenteActivo) {
+          setErrorDatos('No se pudieron cargar los destinos.')
+        }
+      } finally {
+        if (componenteActivo) {
+          setCargandoDestinos(false)
+        }
+      }
+    }
+
+    cargarDestinos()
+
+    return () => {
+      componenteActivo = false
+    }
+  }, [obtenerItems])
+
+  const guardarDestino = useCallback(
+    async (destinoGuardado) => {
+      try {
+        const destinoPersistido = await guardarItem(destinoGuardado)
+
+        setDestinos((destinosActuales) => {
+          const existeDestino = destinosActuales.some(
+            (destino) => destino.id === destinoPersistido.id,
+          )
+
+          if (existeDestino) {
+            return destinosActuales.map((destino) =>
+              destino.id === destinoPersistido.id ? destinoPersistido : destino,
+            )
+          }
+
+          return [destinoPersistido, ...destinosActuales]
+        })
+
+        setDestinoEditando(null)
+        setErrorDatos('')
+      } catch {
+        setErrorDatos('No se pudo guardar el destino.')
+      }
+    },
+    [guardarItem],
+  )
+
+  const eliminarDestino = useCallback(
+    async (destinoId) => {
+      try {
+        const destinoArchivado = await eliminarItem(destinoId)
+
+        setDestinos((destinosActuales) =>
+          destinosActuales.map((destino) =>
+            destino.id === destinoId
+              ? {
+                  ...destino,
+                  activo: destinoArchivado?.activo ?? false,
+                }
+              : destino,
+          ),
         )
+
+        if (destinoEditando?.id === destinoId) {
+          setDestinoEditando(null)
+        }
+
+        setErrorDatos('')
+      } catch {
+        setErrorDatos('No se pudo archivar el destino.')
+      }
+    },
+    [destinoEditando, eliminarItem],
+  )
+
+  const cambiarActivo = useCallback(
+    async (destinoId) => {
+      const destinoActual = destinos.find((destino) => destino.id === destinoId)
+
+      if (!destinoActual) {
+        return
       }
 
-      return [destinoGuardado, ...destinosActuales]
-    })
+      try {
+        const destinoActualizado = await guardarItem({
+          ...destinoActual,
+          activo: !destinoActual.activo,
+        })
 
-    setDestinoEditando(null)
-  }
-
-  function eliminarDestino(destinoId) {
-    setDestinos((destinosActuales) =>
-      destinosActuales.filter((destino) => destino.id !== destinoId),
-    )
-
-    if (destinoEditando?.id === destinoId) {
-      setDestinoEditando(null)
-    }
-  }
-
-  function cambiarActivo(destinoId) {
-    setDestinos((destinosActuales) =>
-      destinosActuales.map((destino) =>
-        destino.id === destinoId
-          ? {
-              ...destino,
-              activo: !destino.activo,
-            }
-          : destino,
-      ),
-    )
-  }
+        setDestinos((destinosActuales) =>
+          destinosActuales.map((destino) =>
+            destino.id === destinoId ? destinoActualizado : destino,
+          ),
+        )
+        setErrorDatos('')
+      } catch {
+        setErrorDatos('No se pudo cambiar el estado del destino.')
+      }
+    },
+    [destinos, guardarItem],
+  )
 
   return (
     <main className="app">
@@ -88,9 +156,15 @@ function App() {
         </div>
         <div>
           <span>Destinos base</span>
-          <strong>{destinos.length}</strong>
+          <strong>{cargandoDestinos ? 'Cargando...' : destinos.length}</strong>
         </div>
       </section>
+
+      {errorDatos && (
+        <p className="data-message" role="alert">
+          {errorDatos}
+        </p>
+      )}
 
       <section className="crud-layout" aria-label="Administrar destinos">
         <FormularioItem

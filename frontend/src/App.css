@@ -82,6 +82,17 @@
   align-items: start;
 }
 
+.data-message {
+  width: min(1120px, calc(100% - 40px));
+  margin: 24px auto 0;
+  border: 1px solid #f0caca;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #9f2d2d;
+  background: #fff1f1;
+  font-weight: 800;
+}
+
 .item-form,
 .destination-card {
   border: 1px solid #dbe5dd;
