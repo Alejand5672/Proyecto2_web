@@ -3,6 +3,11 @@ import {
   guardarDestinos,
   obtenerDestinosGuardados,
 } from '../services/destinosStorage'
+import {
+  archivarDestinoApi,
+  guardarDestinoApi,
+  obtenerDestinosApi,
+} from '../services/destinosApi'
 import { MODO_STORAGE_KEY, StorageContext } from './storageContext'
 
 const MODOS_VALIDOS = ['api', 'local']
@@ -66,11 +71,23 @@ export function StorageProvider({ children }) {
     persistirModo(modo)
   }, [])
 
-  const obtenerItems = useCallback(async () => obtenerDestinosGuardados(), [])
+  const obtenerItems = useCallback(
+    async () =>
+      modoActual === 'api' ? obtenerDestinosApi() : obtenerDestinosGuardados(),
+    [modoActual],
+  )
 
-  const guardarItem = useCallback(async (item) => guardarItemLocal(item), [])
+  const guardarItem = useCallback(
+    async (item) =>
+      modoActual === 'api' ? guardarDestinoApi(item) : guardarItemLocal(item),
+    [modoActual],
+  )
 
-  const eliminarItem = useCallback(async (id) => eliminarItemLocal(id), [])
+  const eliminarItem = useCallback(
+    async (id) =>
+      modoActual === 'api' ? archivarDestinoApi(id) : eliminarItemLocal(id),
+    [modoActual],
+  )
 
   const value = useMemo(
     () => ({
