@@ -7,7 +7,7 @@ import { CATEGORIAS } from './utils/categorias'
 import './App.css'
 
 function App() {
-  const { eliminarItem, guardarItem, obtenerItems } = useStorage()
+  const { eliminarItem, guardarItem, modo, obtenerItems, setModo } = useStorage()
   const [destinos, setDestinos] = useState([])
   const [destinoEditando, setDestinoEditando] = useState(null)
   const [cargandoDestinos, setCargandoDestinos] = useState(true)
@@ -126,6 +126,12 @@ function App() {
     [destinos, guardarItem],
   )
 
+  function cambiarModo(nuevoModo) {
+    setDestinoEditando(null)
+    setErrorDatos('')
+    setModo(nuevoModo)
+  }
+
   return (
     <main className="app">
       <section className="hero">
@@ -157,6 +163,25 @@ function App() {
         <div>
           <span>Destinos base</span>
           <strong>{cargandoDestinos ? 'Cargando...' : destinos.length}</strong>
+        </div>
+        <div>
+          <span>Storage</span>
+          <div className="mode-switch" aria-label="Cambiar modo de almacenamiento">
+            <button
+              className={modo === 'local' ? 'mode-switch__option active' : 'mode-switch__option'}
+              type="button"
+              onClick={() => cambiarModo('local')}
+            >
+              Local
+            </button>
+            <button
+              className={modo === 'api' ? 'mode-switch__option active' : 'mode-switch__option'}
+              type="button"
+              onClick={() => cambiarModo('api')}
+            >
+              API
+            </button>
+          </div>
         </div>
       </section>
 

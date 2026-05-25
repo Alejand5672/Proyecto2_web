@@ -43,7 +43,7 @@
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   width: min(1120px, calc(100% - 40px));
   margin: -72px auto 0;
@@ -71,6 +71,29 @@
   display: block;
   color: #102018;
   line-height: 1.45;
+}
+
+.mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid #cbd8d0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8faf7;
+}
+
+.mode-switch__option {
+  min-height: 40px;
+  border: 0;
+  color: #245f4d;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mode-switch__option.active {
+  color: #ffffff;
+  background: #245f4d;
 }
 
 .crud-layout {
