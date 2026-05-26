@@ -3,11 +3,13 @@ import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 import { useStorage } from './context/storageContext'
+import { useTheme } from './context/themeContext'
 import { CATEGORIAS } from './utils/categorias'
 import './App.css'
 
 function App() {
   const { eliminarItem, guardarItem, modo, obtenerItems, setModo } = useStorage()
+  const { setTema, tema } = useTheme()
   const [destinos, setDestinos] = useState([])
   const [destinoEditando, setDestinoEditando] = useState(null)
   const [cargandoDestinos, setCargandoDestinos] = useState(true)
@@ -132,6 +134,10 @@ function App() {
     setModo(nuevoModo)
   }
 
+  function cambiarTema(nuevoTema) {
+    setTema(nuevoTema)
+  }
+
   return (
     <main className="app">
       <section className="hero">
@@ -180,6 +186,25 @@ function App() {
               onClick={() => cambiarModo('api')}
             >
               API
+            </button>
+          </div>
+        </div>
+        <div>
+          <span>Tema</span>
+          <div className="mode-switch" aria-label="Cambiar tema visual">
+            <button
+              className={tema === 'claro' ? 'mode-switch__option active' : 'mode-switch__option'}
+              type="button"
+              onClick={() => cambiarTema('claro')}
+            >
+              Claro
+            </button>
+            <button
+              className={tema === 'oscuro' ? 'mode-switch__option active' : 'mode-switch__option'}
+              type="button"
+              onClick={() => cambiarTema('oscuro')}
+            >
+              Oscuro
             </button>
           </div>
         </div>

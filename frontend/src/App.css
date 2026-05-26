@@ -1,8 +1,8 @@
 .app {
   min-height: 100vh;
   padding-bottom: 48px;
-  color: #182126;
-  background: #f8faf7;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 .hero {
@@ -43,7 +43,7 @@
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 1px;
   width: min(1120px, calc(100% - 40px));
   margin: -72px auto 0;
