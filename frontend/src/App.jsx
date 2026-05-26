@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
@@ -9,11 +9,16 @@ import './App.css'
 
 function App() {
   const { eliminarItem, guardarItem, modo, obtenerItems, setModo } = useStorage()
-  const { setTema, tema } = useTheme()
+  const { alternarTema, setTema, tema } = useTheme()
   const [destinos, setDestinos] = useState([])
   const [destinoEditando, setDestinoEditando] = useState(null)
   const [cargandoDestinos, setCargandoDestinos] = useState(true)
   const [errorDatos, setErrorDatos] = useState('')
+  const [ultimoDestinoId, setUltimoDestinoId] = useState(null)
+  // useRef: enfoca el campo nombre despues de guardar y con Ctrl + N.
+  const nombreInputRef = useRef(null)
+  // useRef: apunta al destino recien agregado para hacer scroll automatico.
+  const ultimoDestinoRef = useRef(null)
 
   useEffect(() => {
     let componenteActivo = true
@@ -48,6 +53,9 @@ function App() {
   const guardarDestino = useCallback(
     async (destinoGuardado) => {
       try {
+        const esDestinoNuevo = !destinos.some(
+          (destino) => destino.id === destinoGuardado.id,
+        )
         const destinoPersistido = await guardarItem(destinoGuardado)
 
         setDestinos((destinosActuales) => {
@@ -66,11 +74,16 @@ function App() {
 
         setDestinoEditando(null)
         setErrorDatos('')
+        nombreInputRef.current?.focus()
+
+        if (esDestinoNuevo) {
+          setUltimoDestinoId(destinoPersistido.id)
+        }
       } catch {
         setErrorDatos('No se pudo guardar el destino.')
       }
     },
-    [guardarItem],
+    [destinos, guardarItem],
   )
 
   const eliminarDestino = useCallback(
@@ -137,6 +150,44 @@ function App() {
   function cambiarTema(nuevoTema) {
     setTema(nuevoTema)
   }
+
+  useEffect(() => {
+    if (!ultimoDestinoId) {
+      return
+    }
+
+    ultimoDestinoRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }, [ultimoDestinoId, destinos])
+
+  useEffect(() => {
+    function estaEscribiendo(elemento) {
+      const etiqueta = elemento?.tagName
+      return (
+        elemento?.isContentEditable ||
+        etiqueta === 'INPUT' ||
+        etiqueta === 'SELECT' ||
+        etiqueta === 'TEXTAREA'
+      )
+    }
+
+    const handler = (evento) => {
+      if (evento.ctrlKey && evento.key.toLowerCase() === 'n') {
+        evento.preventDefault()
+        nombreInputRef.current?.focus()
+        return
+      }
+
+      if (!estaEscribiendo(evento.target) && evento.key.toLowerCase() === 't') {
+        alternarTema()
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [alternarTema])
 
   return (
     <main className="app">
@@ -220,12 +271,15 @@ function App() {
         <FormularioItem
           destinoEditando={destinoEditando}
           key={destinoEditando?.id ?? 'nuevo-destino'}
+          nombreInputRef={nombreInputRef}
           onCancelar={() => setDestinoEditando(null)}
           onGuardar={guardarDestino}
         />
 
         <ListaItems
           destinos={destinos}
+          ultimoDestinoId={ultimoDestinoId}
+          ultimoDestinoRef={ultimoDestinoRef}
           onCambiarActivo={cambiarActivo}
           onEditar={setDestinoEditando}
           onEliminar={eliminarDestino}

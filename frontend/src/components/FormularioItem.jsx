@@ -34,7 +34,7 @@ function prepararCampos(destino) {
   }
 }
 
-function FormularioItem({ destinoEditando, onGuardar, onCancelar }) {
+function FormularioItem({ destinoEditando, nombreInputRef, onGuardar, onCancelar }) {
   const [campos, setCampos] = useState(() => prepararCampos(destinoEditando))
 
   function actualizarCampo(evento) {
@@ -89,6 +89,7 @@ function FormularioItem({ destinoEditando, onGuardar, onCancelar }) {
           Nombre
           <input
             name="nombre"
+            ref={nombreInputRef}
             value={campos.nombre}
             onChange={actualizarCampo}
             required

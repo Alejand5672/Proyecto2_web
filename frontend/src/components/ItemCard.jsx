@@ -1,10 +1,10 @@
 import { obtenerCategoriaPorId } from '../utils/categorias'
 
-function ItemCard({ destino, onEditar, onEliminar, onCambiarActivo }) {
+function ItemCard({ destino, itemRef, onEditar, onEliminar, onCambiarActivo }) {
   const categoria = obtenerCategoriaPorId(destino.categoriaId)
 
   return (
-    <article className="destination-card">
+    <article className="destination-card" ref={itemRef}>
       <div className="card-header">
         <div>
           <span>{destino.pais}</span>
