@@ -1,16 +1,34 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 import { useStorage } from './context/storageContext'
 import { useTheme } from './context/themeContext'
+import {
+  destinosInitialState,
+  destinosReducer,
+} from './reducers/destinosReducer'
 import { CATEGORIAS, obtenerEtiquetaCategoria } from './utils/categorias'
 import './App.css'
+
+function crearActividadDestino(tipo, destino) {
+  return {
+    id: crypto.randomUUID(),
+    tipo,
+    destinoId: destino.id,
+    destinoNombre: destino.nombre,
+    fecha: new Date().toISOString(),
+  }
+}
 
 function App() {
   const { eliminarItem, guardarItem, modo, obtenerItems, setModo } = useStorage()
   const { alternarTema, setTema, tema } = useTheme()
-  const [destinos, setDestinos] = useState([])
+  const [destinosState, dispatchDestinos] = useReducer(
+    destinosReducer,
+    destinosInitialState,
+  )
+  const { destinos } = destinosState
   const [destinoEditando, setDestinoEditando] = useState(null)
   const [cargandoDestinos, setCargandoDestinos] = useState(true)
   const [errorDatos, setErrorDatos] = useState('')
@@ -29,7 +47,10 @@ function App() {
         const destinosGuardados = await obtenerItems()
 
         if (componenteActivo) {
-          setDestinos(destinosGuardados)
+          dispatchDestinos({
+            type: 'CARGAR_DESTINOS',
+            payload: destinosGuardados,
+          })
           setErrorDatos('')
         }
       } catch {
@@ -58,18 +79,16 @@ function App() {
         )
         const destinoPersistido = await guardarItem(destinoGuardado)
 
-        setDestinos((destinosActuales) => {
-          const existeDestino = destinosActuales.some(
-            (destino) => destino.id === destinoPersistido.id,
-          )
-
-          if (existeDestino) {
-            return destinosActuales.map((destino) =>
-              destino.id === destinoPersistido.id ? destinoPersistido : destino,
-            )
-          }
-
-          return [destinoPersistido, ...destinosActuales]
+        dispatchDestinos({
+          type: esDestinoNuevo ? 'AGREGAR_DESTINO' : 'ACTUALIZAR_DESTINO',
+          payload: destinoPersistido,
+        })
+        dispatchDestinos({
+          type: 'REGISTRAR_ACTIVIDAD_DESTINO',
+          payload: crearActividadDestino(
+            esDestinoNuevo ? 'agregado' : 'actualizado',
+            destinoPersistido,
+          ),
         })
 
         setDestinoEditando(null)
@@ -90,17 +109,22 @@ function App() {
     async (destinoId) => {
       try {
         const destinoArchivado = await eliminarItem(destinoId)
+        const destinoActual = destinos.find((destino) => destino.id === destinoId)
 
-        setDestinos((destinosActuales) =>
-          destinosActuales.map((destino) =>
-            destino.id === destinoId
-              ? {
-                  ...destino,
-                  activo: destinoArchivado?.activo ?? false,
-                }
-              : destino,
-          ),
-        )
+        dispatchDestinos({
+          type: 'ARCHIVAR_DESTINO',
+          payload: destinoId,
+        })
+
+        if (destinoActual || destinoArchivado) {
+          dispatchDestinos({
+            type: 'REGISTRAR_ACTIVIDAD_DESTINO',
+            payload: crearActividadDestino(
+              'archivado',
+              destinoArchivado ?? destinoActual,
+            ),
+          })
+        }
 
         if (destinoEditando?.id === destinoId) {
           setDestinoEditando(null)
@@ -111,7 +135,7 @@ function App() {
         setErrorDatos('No se pudo archivar el destino.')
       }
     },
-    [destinoEditando, eliminarItem],
+    [destinoEditando, destinos, eliminarItem],
   )
 
   const cambiarActivo = useCallback(
@@ -128,11 +152,14 @@ function App() {
           activo: !destinoActual.activo,
         })
 
-        setDestinos((destinosActuales) =>
-          destinosActuales.map((destino) =>
-            destino.id === destinoId ? destinoActualizado : destino,
-          ),
-        )
+        dispatchDestinos({
+          type: 'CAMBIAR_ESTADO_DESTINO',
+          payload: destinoActualizado,
+        })
+        dispatchDestinos({
+          type: 'REGISTRAR_ACTIVIDAD_DESTINO',
+          payload: crearActividadDestino('estado cambiado', destinoActualizado),
+        })
         setErrorDatos('')
       } catch {
         setErrorDatos('No se pudo cambiar el estado del destino.')
