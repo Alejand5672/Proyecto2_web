@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CATEGORIAS } from '../utils/categorias'
+import { CATEGORIAS, obtenerEtiquetaCategoria } from '../utils/categorias'
 import { crearDestino, destinoInicial } from '../utils/destinoModelo'
 
 const camposIniciales = {
@@ -105,7 +105,7 @@ function FormularioItem({ destinoEditando, nombreInputRef, onGuardar, onCancelar
           >
             {CATEGORIAS.map((categoria) => (
               <option key={categoria.id} value={categoria.id}>
-                {categoria.nombre}
+                {obtenerEtiquetaCategoria(categoria)}
               </option>
             ))}
           </select>

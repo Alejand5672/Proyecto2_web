@@ -1,4 +1,7 @@
-import { obtenerCategoriaPorId } from '../utils/categorias'
+import {
+  obtenerCategoriaPorId,
+  obtenerEtiquetaCategoria,
+} from '../utils/categorias'
 
 function ItemCard({ destino, itemRef, onEditar, onEliminar, onCambiarActivo }) {
   const categoria = obtenerCategoriaPorId(destino.categoriaId)
@@ -26,7 +29,14 @@ function ItemCard({ destino, itemRef, onEditar, onEliminar, onCambiarActivo }) {
         </div>
         <div>
           <dt>Categoria</dt>
-          <dd>{categoria?.nombre}</dd>
+          <dd>
+            <span
+              className="category-badge"
+              style={{ '--categoria-color': categoria?.color }}
+            >
+              {obtenerEtiquetaCategoria(categoria)}
+            </span>
+          </dd>
         </div>
         <div>
           <dt>Calificacion</dt>

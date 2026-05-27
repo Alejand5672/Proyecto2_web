@@ -4,7 +4,7 @@ import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 import { useStorage } from './context/storageContext'
 import { useTheme } from './context/themeContext'
-import { CATEGORIAS } from './utils/categorias'
+import { CATEGORIAS, obtenerEtiquetaCategoria } from './utils/categorias'
 import './App.css'
 
 function App() {
@@ -215,7 +215,11 @@ function App() {
         </div>
         <div>
           <span>Categorías</span>
-          <strong>{CATEGORIAS.map((categoria) => categoria.nombre).join(', ')}</strong>
+          <strong>
+            {CATEGORIAS.map((categoria) =>
+              obtenerEtiquetaCategoria(categoria),
+            ).join(', ')}
+          </strong>
         </div>
         <div>
           <span>Destinos base</span>

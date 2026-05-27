@@ -281,6 +281,17 @@
   font-weight: 700;
 }
 
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 4px solid var(--categoria-color, var(--color-accent));
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--color-field);
+  color: var(--color-heading);
+}
+
 .destination-card p {
   margin: auto 0 0;
   color: var(--color-muted);
