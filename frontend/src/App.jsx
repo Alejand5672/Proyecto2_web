@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
@@ -19,6 +26,10 @@ function crearActividadDestino(tipo, destino) {
     destinoNombre: destino.nombre,
     fecha: new Date().toISOString(),
   }
+}
+
+function normalizarTexto(texto) {
+  return texto.toLowerCase().trim()
 }
 
 function App() {
@@ -70,6 +81,40 @@ function App() {
       componenteActivo = false
     }
   }, [obtenerItems])
+
+  const destinosFiltrados = useMemo(() => {
+    const busquedaNormalizada = normalizarTexto(destinosState.busqueda)
+
+    return destinos.filter(
+      (destino) =>
+        (destinosState.filtroCategoria === 'todas' ||
+          destino.categoriaId === destinosState.filtroCategoria) &&
+        (destinosState.filtroEstado === 'todos' ||
+          (destinosState.filtroEstado === 'activos' && destino.activo) ||
+          (destinosState.filtroEstado === 'inactivos' && !destino.activo)) &&
+        destino.nombre.toLowerCase().includes(busquedaNormalizada),
+    )
+  }, [
+    destinos,
+    destinosState.busqueda,
+    destinosState.filtroCategoria,
+    destinosState.filtroEstado,
+  ])
+
+  const cambiarFiltros = useCallback((evento) => {
+    const { name, value } = evento.target
+
+    dispatchDestinos({
+      type: 'ACTUALIZAR_FILTROS',
+      payload: {
+        [name]: value,
+      },
+    })
+  }, [])
+
+  const limpiarFiltros = useCallback(() => {
+    dispatchDestinos({ type: 'LIMPIAR_FILTROS' })
+  }, [])
 
   const guardarDestino = useCallback(
     async (destinoGuardado) => {
@@ -298,6 +343,61 @@ function App() {
         </p>
       )}
 
+      <section className="filters-panel" aria-label="Filtrar destinos">
+        <label>
+          Categoria
+          <select
+            name="filtroCategoria"
+            value={destinosState.filtroCategoria}
+            onChange={cambiarFiltros}
+          >
+            <option value="todas">Todas</option>
+            {CATEGORIAS.map((categoria) => (
+              <option key={categoria.id} value={categoria.id}>
+                {obtenerEtiquetaCategoria(categoria)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          Estado
+          <select
+            name="filtroEstado"
+            value={destinosState.filtroEstado}
+            onChange={cambiarFiltros}
+          >
+            <option value="todos">Todos</option>
+            <option value="activos">Activos</option>
+            <option value="inactivos">Inactivos</option>
+          </select>
+        </label>
+
+        <label>
+          Busqueda
+          <input
+            name="busqueda"
+            type="search"
+            value={destinosState.busqueda}
+            onChange={cambiarFiltros}
+            placeholder="Buscar por destino"
+          />
+        </label>
+
+        <div className="filters-panel__actions">
+          <span>
+            {destinosFiltrados.length} de {destinos.length}
+          </span>
+          <button
+            className="button button--ghost"
+            type="button"
+            onClick={limpiarFiltros}
+          >
+            Limpiar
+          </button>
+        </div>
+      </section>
+
       <section className="crud-layout" aria-label="Administrar destinos">
         <FormularioItem
           destinoEditando={destinoEditando}
@@ -308,7 +408,7 @@ function App() {
         />
 
         <ListaItems
-          destinos={destinos}
+          destinos={destinosFiltrados}
           ultimoDestinoId={ultimoDestinoId}
           ultimoDestinoRef={ultimoDestinoRef}
           onCambiarActivo={cambiarActivo}
