@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import {
   guardarDestinos,
   obtenerDestinosGuardados,
@@ -11,27 +12,6 @@ import {
 import { MODO_STORAGE_KEY, StorageContext } from './storageContext'
 
 const MODOS_VALIDOS = ['api', 'local']
-
-function tieneLocalStorage() {
-  return typeof window !== 'undefined' && Boolean(window.localStorage)
-}
-
-function obtenerModoGuardado() {
-  if (!tieneLocalStorage()) {
-    return 'local'
-  }
-
-  const modoGuardado = window.localStorage.getItem(MODO_STORAGE_KEY)
-  return MODOS_VALIDOS.includes(modoGuardado) ? modoGuardado : 'local'
-}
-
-function persistirModo(modo) {
-  if (!tieneLocalStorage()) {
-    return
-  }
-
-  window.localStorage.setItem(MODO_STORAGE_KEY, modo)
-}
 
 function guardarItemLocal(item) {
   const destinos = obtenerDestinosGuardados()
@@ -60,16 +40,27 @@ function eliminarItemLocal(id) {
 }
 
 export function StorageProvider({ children }) {
-  const [modoActual, setModoActual] = useState(obtenerModoGuardado)
+  const [modoGuardado, setModoGuardado] = useLocalStorage(
+    MODO_STORAGE_KEY,
+    'local',
+  )
+  const modoActual = MODOS_VALIDOS.includes(modoGuardado)
+    ? modoGuardado
+    : 'local'
+
+  useEffect(() => {
+    if (modoGuardado !== modoActual) {
+      setModoGuardado(modoActual)
+    }
+  }, [modoActual, modoGuardado, setModoGuardado])
 
   const setModo = useCallback((modo) => {
     if (!MODOS_VALIDOS.includes(modo)) {
       return
     }
 
-    setModoActual(modo)
-    persistirModo(modo)
-  }, [])
+    setModoGuardado(modo)
+  }, [setModoGuardado])
 
   const obtenerItems = useCallback(
     async () =>

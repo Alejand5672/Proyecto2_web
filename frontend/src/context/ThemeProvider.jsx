@@ -1,48 +1,39 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { THEME_STORAGE_KEY, ThemeContext } from './themeContext'
 
 const TEMAS_VALIDOS = ['claro', 'oscuro']
 
-function tieneLocalStorage() {
-  return typeof window !== 'undefined' && Boolean(window.localStorage)
-}
-
-function obtenerTemaGuardado() {
-  if (!tieneLocalStorage()) {
-    return 'claro'
-  }
-
-  const temaGuardado = window.localStorage.getItem(THEME_STORAGE_KEY)
-  return TEMAS_VALIDOS.includes(temaGuardado) ? temaGuardado : 'claro'
-}
-
-function persistirTema(tema) {
-  if (!tieneLocalStorage()) {
-    return
-  }
-
-  window.localStorage.setItem(THEME_STORAGE_KEY, tema)
-}
-
 export function ThemeProvider({ children }) {
-  const [temaActual, setTemaActual] = useState(obtenerTemaGuardado)
+  const [temaGuardado, setTemaGuardado] = useLocalStorage(
+    THEME_STORAGE_KEY,
+    'claro',
+  )
+  const temaActual = TEMAS_VALIDOS.includes(temaGuardado)
+    ? temaGuardado
+    : 'claro'
 
   useEffect(() => {
     document.body.setAttribute('data-theme', temaActual)
-    persistirTema(temaActual)
   }, [temaActual])
+
+  useEffect(() => {
+    if (temaGuardado !== temaActual) {
+      setTemaGuardado(temaActual)
+    }
+  }, [setTemaGuardado, temaActual, temaGuardado])
 
   const setTema = useCallback((tema) => {
     if (!TEMAS_VALIDOS.includes(tema)) {
       return
     }
 
-    setTemaActual(tema)
-  }, [])
+    setTemaGuardado(tema)
+  }, [setTemaGuardado])
 
   const alternarTema = useCallback(() => {
-    setTemaActual((tema) => (tema === 'claro' ? 'oscuro' : 'claro'))
-  }, [])
+    setTemaGuardado((tema) => (tema === 'claro' ? 'oscuro' : 'claro'))
+  }, [setTemaGuardado])
 
   const value = useMemo(
     () => ({
