@@ -2,7 +2,7 @@
 ## Sistemas y tecnologías web - Proyecto 2
 ## Prof. Ludwing Cano
 
-# Viajes y Lugares - Fase 1 y 2
+# Viajes y Lugares - Fase 1, 2 y 3
 
 Proyecto universitario con frontend en React + Vite y backend en Express.
 
@@ -43,6 +43,12 @@ proyecto2_web/
   - FormularioItem.jsx
   - ListaItems.jsx
   - ItemCard.jsx
+- Fase 3:
+  - useReducer para manejar destinos, filtros y actividad.
+  - Filtros combinados por categoria, estado y busqueda.
+  - 3 graficas con Recharts.
+  - useMemo para lista filtrada y datos de graficas.
+  - useCallback y React.memo para optimizar tarjetas.
 
 Comandos:
 
@@ -53,6 +59,81 @@ npm run dev
 npm run build
 npm run lint
 ```
+
+## Fase 3 - Reducer
+
+El estado principal de destinos se migro a `useReducer` en
+`frontend/src/reducers/destinosReducer.js`. El reducer es puro.
+
+Acciones implementadas:
+
+```text
+CARGAR_DESTINOS
+AGREGAR_DESTINO
+ACTUALIZAR_DESTINO
+ARCHIVAR_DESTINO
+CAMBIAR_ESTADO_DESTINO
+ACTUALIZAR_FILTROS
+LIMPIAR_FILTROS
+REGISTRAR_ACTIVIDAD_DESTINO
+```
+
+## Fase 3 - Graficas
+
+Las graficas estan en `frontend/src/components/GraficasDestinos.jsx` y se
+actualizan con los filtros activos. Todas tienen `Tooltip` y `Legend`.
+
+```text
+1. Actividad ultimos 7 dias: muestra acciones registradas sobre destinos.
+2. Destinos por categoria: muestra la distribucion por tipo de viaje.
+3. Dias visitados por categoria: muestra el tiempo invertido por categoria.
+```
+
+## Mi grafica original
+
+Mi grafica original es "Dias visitados por categoria". La elegi porque en un
+log de viajes no solo importa cuantos destinos se registran, sino cuanto tiempo
+se dedica a cada tipo de experiencia: playa, naturaleza, historico,
+gastronomico o ciudad.
+
+## Optimizacion
+
+La lista visible usa `useMemo` para recalcularse solo cuando cambia la lista de
+destinos o alguno de los filtros: categoria, estado o busqueda. Los datos de
+las graficas tambien usan `useMemo`, porque transforman los destinos filtrados
+en series para Recharts.
+
+Los handlers que llegan a `ItemCard` se mantienen con `useCallback`, y
+`ItemCard` se exporta con `React.memo`. Con esto, una tarjeta puede evitar
+renderizarse cuando sus props no cambian.
+
+## Evidencia React DevTools Profiler
+
+Capturas de Profiler incluidas para la entrega:
+
+### Antes de useMemo
+
+![Profiler antes de useMemo](./capturasPrueba/imagenantesMEMO.png)
+
+### Despues de useMemo
+
+![Profiler despues de useMemo](./capturasPrueba/imagenDespuesMEMO.png)
+
+Antes de aplicar la optimizacion, escribir en el buscador provocaba
+que la lista se filtrara y que las tarjetas recibieran funciones nuevas en cada
+render. Despues de usar `useMemo`, `useCallback` y `React.memo`, los calculos
+derivados se recalculan solo cuando cambian sus dependencias reales, y las
+tarjetas que conservan las mismas props pueden dejar de re-renderizarse.
+
+## Mis 3 decisiones tecnicas
+
+1. Estructura del reducer: use nombres de acciones relacionados con viajes y
+   destinos para que el codigo no quedara como una plantilla generica.
+2. Accion mas dificil: `CAMBIAR_ESTADO_DESTINO`, porque primero se persiste el
+   cambio en LocalStorage o API y despues se actualiza el reducer con el destino
+   confirmado.
+3. Grafica mas compleja: actividad ultimos 7 dias, porque convierte el registro
+   de actividad en una serie temporal y ademas respeta los filtros activos.
 
 ## Backend
 

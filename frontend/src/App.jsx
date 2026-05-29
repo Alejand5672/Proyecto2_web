@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import heroImg from './assets/hero.png'
 import FormularioItem from './components/FormularioItem'
 import GraficasDestinos from './components/GraficasDestinos'
 import ListaItems from './components/ListaItems'
@@ -186,6 +185,14 @@ function App() {
     dispatchDestinos({ type: 'LIMPIAR_FILTROS' })
   }, [])
 
+  const editarDestino = useCallback((destino) => {
+    setDestinoEditando(destino)
+  }, [])
+
+  const cancelarEdicion = useCallback(() => {
+    setDestinoEditando(null)
+  }, [])
+
   const guardarDestino = useCallback(
     async (destinoGuardado) => {
       try {
@@ -283,15 +290,15 @@ function App() {
     [destinos, guardarItem],
   )
 
-  function cambiarModo(nuevoModo) {
+  const cambiarModo = useCallback((nuevoModo) => {
     setDestinoEditando(null)
     setErrorDatos('')
     setModo(nuevoModo)
-  }
+  }, [setModo])
 
-  function cambiarTema(nuevoTema) {
+  const cambiarTema = useCallback((nuevoTema) => {
     setTema(nuevoTema)
-  }
+  }, [setTema])
 
   useEffect(() => {
     if (!ultimoDestinoId) {
@@ -335,15 +342,8 @@ function App() {
     <main className="app">
       <section className="hero">
         <div className="hero__content">
-          <p className="hero__eyebrow">Fase 1</p>
           <h1>Viajes y Lugares</h1>
         </div>
-
-        <img
-          className="hero__image"
-          src={heroImg}
-          alt="Ilustracion de destinos de viaje"
-        />
       </section>
 
       <section className="summary" aria-label="Datos base del proyecto">
@@ -479,7 +479,7 @@ function App() {
           destinoEditando={destinoEditando}
           key={destinoEditando?.id ?? 'nuevo-destino'}
           nombreInputRef={nombreInputRef}
-          onCancelar={() => setDestinoEditando(null)}
+          onCancelar={cancelarEdicion}
           onGuardar={guardarDestino}
         />
 
@@ -488,7 +488,7 @@ function App() {
           ultimoDestinoId={ultimoDestinoId}
           ultimoDestinoRef={ultimoDestinoRef}
           onCambiarActivo={cambiarActivo}
-          onEditar={setDestinoEditando}
+          onEditar={editarDestino}
           onEliminar={eliminarDestino}
         />
       </section>

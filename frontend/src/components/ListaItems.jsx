@@ -15,9 +15,9 @@ function ListaItems({
           destino={destino}
           itemRef={destino.id === ultimoDestinoId ? ultimoDestinoRef : null}
           key={destino.id}
-          onCambiarActivo={() => onCambiarActivo(destino.id)}
-          onEditar={() => onEditar(destino)}
-          onEliminar={() => onEliminar(destino.id)}
+          onCambiarActivo={onCambiarActivo}
+          onEditar={onEditar}
+          onEliminar={onEliminar}
         />
       ))}
     </section>

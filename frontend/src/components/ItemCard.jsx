@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   obtenerCategoriaPorId,
   obtenerEtiquetaCategoria,
@@ -55,13 +56,25 @@ function ItemCard({ destino, itemRef, onEditar, onEliminar, onCambiarActivo }) {
       <p>{destino.atributos.notas}</p>
 
       <div className="card-actions">
-        <button className="button button--ghost" type="button" onClick={onEditar}>
+        <button
+          className="button button--ghost"
+          type="button"
+          onClick={() => onEditar(destino)}
+        >
           Editar
         </button>
-        <button className="button button--ghost" type="button" onClick={onCambiarActivo}>
+        <button
+          className="button button--ghost"
+          type="button"
+          onClick={() => onCambiarActivo(destino.id)}
+        >
           {destino.activo ? 'Desactivar' : 'Activar'}
         </button>
-        <button className="button button--danger" type="button" onClick={onEliminar}>
+        <button
+          className="button button--danger"
+          type="button"
+          onClick={() => onEliminar(destino.id)}
+        >
           Eliminar
         </button>
       </div>
@@ -69,4 +82,4 @@ function ItemCard({ destino, itemRef, onEditar, onEliminar, onCambiarActivo }) {
   )
 }
 
-export default ItemCard
+export default React.memo(ItemCard)
