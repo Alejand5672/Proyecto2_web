@@ -11,10 +11,13 @@ import GraficasDestinos from './components/GraficasDestinos'
 import ListaItems from './components/ListaItems'
 import { useStorage } from './context/storageContext'
 import { useTheme } from './context/themeContext'
+import { useAtajoTeclado } from './hooks/useAtajoTeclado'
+import { useFetch } from './hooks/useFetch'
 import {
   destinosInitialState,
   destinosReducer,
 } from './reducers/destinosReducer'
+import { API_BASE_URL } from './services/destinosApi'
 import { CATEGORIAS, obtenerEtiquetaCategoria } from './utils/categorias'
 import './App.css'
 
@@ -37,6 +40,11 @@ function normalizarTexto(texto) {
 function App() {
   const { eliminarItem, guardarItem, modo, obtenerItems, setModo } = useStorage()
   const { alternarTema, setTema, tema } = useTheme()
+  const apiHealthUrl = modo === 'api' ? `${API_BASE_URL}/health` : null
+  const {
+    error: errorApi,
+    loading: verificandoApi,
+  } = useFetch(apiHealthUrl)
   const [destinosState, dispatchDestinos] = useReducer(
     destinosReducer,
     destinosInitialState,
@@ -300,6 +308,10 @@ function App() {
     setTema(nuevoTema)
   }, [setTema])
 
+  const enfocarNombre = useCallback(() => {
+    nombreInputRef.current?.focus()
+  }, [])
+
   useEffect(() => {
     if (!ultimoDestinoId) {
       return
@@ -311,32 +323,11 @@ function App() {
     })
   }, [ultimoDestinoId, destinos])
 
-  useEffect(() => {
-    function estaEscribiendo(elemento) {
-      const etiqueta = elemento?.tagName
-      return (
-        elemento?.isContentEditable ||
-        etiqueta === 'INPUT' ||
-        etiqueta === 'SELECT' ||
-        etiqueta === 'TEXTAREA'
-      )
-    }
-
-    const handler = (evento) => {
-      if (evento.ctrlKey && evento.key.toLowerCase() === 'n') {
-        evento.preventDefault()
-        nombreInputRef.current?.focus()
-        return
-      }
-
-      if (!estaEscribiendo(evento.target) && evento.key.toLowerCase() === 't') {
-        alternarTema()
-      }
-    }
-
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [alternarTema])
+  useAtajoTeclado('n', enfocarNombre, {
+    ctrlKey: true,
+    ignorarInputs: false,
+  })
+  useAtajoTeclado('t', alternarTema)
 
   return (
     <main className="app">
@@ -385,6 +376,13 @@ function App() {
               API
             </button>
           </div>
+          {modo === 'api' && (
+            <small>
+              {verificandoApi && 'Verificando API...'}
+              {!verificandoApi && errorApi && 'API no disponible'}
+              {!verificandoApi && !errorApi && 'API conectada'}
+            </small>
+          )}
         </div>
         <div>
           <span>Tema</span>
