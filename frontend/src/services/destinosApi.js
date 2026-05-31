@@ -1,4 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
+function normalizarApiBaseUrl(url) {
+  const urlSinSlashFinal = url.replace(/\/$/, '')
+
+  return urlSinSlashFinal.endsWith('/api')
+    ? urlSinSlashFinal
+    : `${urlSinSlashFinal}/api`
+}
+
+const API_BASE_URL = normalizarApiBaseUrl(
+  import.meta.env.VITE_API_URL ?? 'http://localhost:3000',
+)
 const ITEMS_ENDPOINT = `${API_BASE_URL}/items`
 
 async function pedirJson(url, options = {}) {

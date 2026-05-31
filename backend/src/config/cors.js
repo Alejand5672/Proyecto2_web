@@ -2,7 +2,7 @@ import cors from 'cors'
 import { env } from './env.js'
 
 const origenesPermitidos = [
-  env.frontendUrl,
+  ...env.frontendUrls,
   'http://localhost:5173',
   'http://127.0.0.1:5173',
 ]

@@ -248,7 +248,7 @@ function App() {
     <main className="app">
       <section className="hero">
         <div className="hero__content">
-          <h1>Viajes y Lugares</h1>
+          <h1>Viajes y Lugares 🛩️</h1>
         </div>
       </section>
 
