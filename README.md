@@ -9,9 +9,9 @@ Proyecto final de Sistemas y tecnologias web.
 
 | Recurso | URL |
 | --- | --- |
-| Frontend en Vercel | Pendiente de deploy |
-| Backend en Render | Pendiente de deploy |
-| Health check backend | Pendiente de deploy |
+| Frontend en Vercel | https://proyecto2-web-seven.vercel.app |
+| Backend en Render | https://proyecto2-web-backend.onrender.com |
+| Health check backend | https://proyecto2-web-backend.onrender.com/api/health |
 
 ## Tema
 
@@ -163,7 +163,7 @@ Estos items viven en `frontend/src/services/destinosIniciales.js` para LocalStor
 - Tabla `items`.
 - Tabla `registros`.
 - Seed inicial para que la API no arranque vacia.
-- `DELETE /api/items/:id` archiva con `activo = 0`.
+- `DELETE /api/items/:id` elimina el destino de SQLite.
 
 Endpoints:
 
@@ -312,10 +312,17 @@ Todos los hooks estan en `src/hooks/`, un hook por archivo, y tienen JSDoc con `
 
 ### Deploy
 
+El frontend fue desplegado en Vercel usando la carpeta `frontend` como proyecto Vite. La variable de entorno `VITE_API_URL` apunta al backend publicado en Render.
+
+El backend fue desplegado en Render como Web Service de Node.js usando la carpeta `backend`. La base de datos SQLite se inicializa desde el servidor y guarda los destinos creados, editados, activados y desactivados desde el modo API. Los destinos eliminados se remueven de SQLite.
+
+- Frontend: https://proyecto2-web-seven.vercel.app
+- Backend: https://proyecto2-web-backend.onrender.com
+- Health check: https://proyecto2-web-backend.onrender.com/api/health
 
 ## Video de demostracion
 
-
+https://youtu.be/MXqHqXhDI8M
 
 ## Sobre mi
 
