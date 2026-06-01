@@ -13,16 +13,6 @@ Proyecto final de Sistemas y tecnologias web.
 | Backend en Render | Pendiente de deploy |
 | Health check backend | Pendiente de deploy |
 
-## Autor
-
-| Dato | Informacion |
-| --- | --- |
-| Nombre | Luis Alejandro Hernandez Marquez |
-| Carnet | 241424 |
-| Curso | Sistemas y tecnologias web |
-| Profesor | Ludwing Cano |
-| Semestre | Primer semestre 2026 |
-
 ## Tema
 
 La aplicacion es un log de destinos visitados. Permite registrar lugares de viaje con pais, ciudad, estado, categoria, calificacion, dias visitados, tipo de experiencia, notas y estado activo.
@@ -31,7 +21,15 @@ La aplicacion es un log de destinos visitados. Permite registrar lugares de viaj
 
 ### Modo claro
 
-![Captura fase 1](./capturasPrueba/primeraFase.png)
+![Modo claro](./capturasPrueba/UltimaCapModoClaro.png)
+
+### Modo oscuro
+
+![Modo oscuro](./capturasPrueba/UltimaCapModoOscuro.png)
+
+### Graficas visibles
+
+![Graficas visibles](./capturasPrueba/Graficas.png)
 
 ### Profiler antes de useMemo
 
@@ -44,12 +42,6 @@ La aplicacion es un log de destinos visitados. Permite registrar lugares de viaj
 ### Analisis de useMemo
 
 Antes de aplicar la optimizacion, escribir en el buscador provocaba que la lista se filtrara y que las tarjetas recibieran funciones nuevas en cada render. Despues de usar `useMemo`, `useCallback` y `React.memo`, los calculos derivados se recalculan solo cuando cambian sus dependencias reales, y las tarjetas que conservan las mismas props pueden dejar de re-renderizarse.
-
-### Capturas pendientes antes del deploy
-
-- Captura actualizada en modo claro.
-- Captura actualizada en modo oscuro.
-- Captura con las graficas visibles desde la version final.
 
 ## Stack tecnologico
 
