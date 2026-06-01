@@ -3,9 +3,7 @@ import { crearIdRegistro } from '../db/schema.js'
 import { mapearItem, prepararItem } from '../utils/itemsMapper.js'
 
 export async function obtenerItems() {
-  const rows = await all(
-    'SELECT * FROM items WHERE activo = 1 ORDER BY fechaRegistro DESC',
-  )
+  const rows = await all('SELECT * FROM items ORDER BY fechaRegistro DESC')
   return rows.map(mapearItem)
 }
 
@@ -96,15 +94,7 @@ export async function actualizarItem(id, datos) {
 }
 
 export async function eliminarItem(id) {
-  const resultado = await run(
-    `UPDATE items
-    SET
-      activo = 0,
-      fechaActividad = ?,
-      actualizadoEn = CURRENT_TIMESTAMP
-    WHERE id = ?`,
-    [new Date().toISOString(), id],
-  )
+  const resultado = await run('DELETE FROM items WHERE id = ?', [id])
 
   return resultado.changes > 0
 }
