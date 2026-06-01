@@ -26,17 +26,11 @@ function guardarItemLocal(item) {
 
 function eliminarItemLocal(id) {
   const destinos = obtenerDestinosGuardados()
-  const destinosActualizados = destinos.map((destino) =>
-    destino.id === id
-      ? {
-          ...destino,
-          activo: false,
-        }
-      : destino,
-  )
+  const destinoEliminado = destinos.find((destino) => destino.id === id) ?? null
+  const destinosActualizados = destinos.filter((destino) => destino.id !== id)
 
   guardarDestinos(destinosActualizados)
-  return destinosActualizados.find((destino) => destino.id === id) ?? null
+  return destinoEliminado
 }
 
 export function StorageProvider({ children }) {

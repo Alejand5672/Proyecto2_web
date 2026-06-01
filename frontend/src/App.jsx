@@ -153,7 +153,7 @@ function App() {
   const eliminarDestino = useCallback(
     async (destinoId) => {
       try {
-        const destinoArchivado = await eliminarItem(destinoId)
+        const destinoEliminado = await eliminarItem(destinoId)
         const destinoActual = destinos.find((destino) => destino.id === destinoId)
 
         dispatchDestinos({
@@ -161,12 +161,12 @@ function App() {
           payload: destinoId,
         })
 
-        if (destinoActual || destinoArchivado) {
+        if (destinoActual || destinoEliminado) {
           dispatchDestinos({
             type: 'REGISTRAR_ACTIVIDAD_DESTINO',
             payload: crearActividadDestino(
-              'archivado',
-              destinoArchivado ?? destinoActual,
+              'eliminado',
+              destinoEliminado ?? destinoActual,
             ),
           })
         }
@@ -177,7 +177,7 @@ function App() {
 
         setErrorDatos('')
       } catch {
-        setErrorDatos('No se pudo archivar el destino.')
+        setErrorDatos('No se pudo eliminar el destino.')
       }
     },
     [destinoEditando, destinos, eliminarItem],

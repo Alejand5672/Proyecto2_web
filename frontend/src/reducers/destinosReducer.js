@@ -39,14 +39,7 @@ export function destinosReducer(state, action) {
     case 'ARCHIVAR_DESTINO':
       return {
         ...state,
-        destinos: state.destinos.map((destino) =>
-          destino.id === action.payload
-            ? {
-                ...destino,
-                activo: false,
-              }
-            : destino,
-        ),
+        destinos: state.destinos.filter((destino) => destino.id !== action.payload),
       }
 
     case 'CAMBIAR_ESTADO_DESTINO':

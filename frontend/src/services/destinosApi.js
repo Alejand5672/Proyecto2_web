@@ -48,9 +48,15 @@ export async function obtenerDestinosApi() {
   return pedirJson(ITEMS_ENDPOINT)
 }
 
+async function obtenerDestinoApiPorId(id) {
+  return pedirJson(`${ITEMS_ENDPOINT}/${id}`)
+}
+
 export async function guardarDestinoApi(item) {
-  const destinos = await obtenerDestinosApi()
-  const existeItem = destinos.some((destino) => String(destino.id) === String(item.id))
+  const existeItem = await obtenerDestinoApiPorId(item.id)
+    .then(() => true)
+    .catch(() => false)
+
   const metodo = existeItem ? 'PUT' : 'POST'
   const url = existeItem ? `${ITEMS_ENDPOINT}/${item.id}` : ITEMS_ENDPOINT
 
@@ -61,21 +67,8 @@ export async function guardarDestinoApi(item) {
 }
 
 export async function archivarDestinoApi(id) {
-  const destinos = await obtenerDestinosApi()
-  const destino = destinos.find((item) => String(item.id) === String(id))
-
-  if (!destino) {
-    throw new Error('Destino no encontrado')
-  }
-
   return pedirJson(`${ITEMS_ENDPOINT}/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(
-      prepararItemParaApi({
-        ...destino,
-        activo: false,
-      }),
-    ),
+    method: 'DELETE',
   })
 }
 
